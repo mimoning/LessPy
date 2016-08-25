@@ -46,12 +46,13 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
-#TODO head portrait
+
+# TODO head portrait
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
-    posts = db.relationship('posts', backref='author', lazy='dynamic')
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
     username = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64), unique=True)
     password_hash = db.Column(db.String(128))
@@ -147,12 +148,11 @@ class Language(db.Model):
         db.session.commit()
 
 
-
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer(), primary_key=True)
     body = db.Column(db.Text())
-    timestamp = db.Column(db.DateTime(), index=True, default=datetime.utc)
+    timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
 
 

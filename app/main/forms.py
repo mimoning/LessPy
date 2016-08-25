@@ -2,11 +2,12 @@ from flask_wtf import Form
 from wtforms import StringField, SelectField, TextAreaField, SubmitField, \
     BooleanField, ValidationError
 from wtforms.validators import DataRequired, Length, Email, Regexp
+from flask_pagedown.fields import PageDownField
 
 from ..models import Language, Role, User
 
 
-class EditProfileForm(Form):
+class ProfileForm(Form):
     name = StringField('Real name', validators=[Length(0, 64)])
     location = StringField('Location', validators=[Length(0, 64)])
     main_language = SelectField('Main language', coerece=int)
@@ -15,13 +16,13 @@ class EditProfileForm(Form):
     submit = SubmitField('Submit')
 
     def __init__(self, *args, **kwargs):
-        super(EditProfileForm, self).__init__(*args, **kwargs)
+        super(ProfileForm, self).__init__(*args, **kwargs)
         self.main_language.choices = [
             (language.id, language.name) for language in
             Language.query.order_by(Language.id).all()]
 
 
-class EdiProfileAdminForm(Form):
+class ProfileAdminForm(Form):
     username = StringField('Username', validators=[
         DataRequired(), Length(0, 64), Regexp('^[A-Za-z][A-Za-z0-9._]*$', 0,
                                               'Username must have only letters,'
@@ -37,7 +38,7 @@ class EdiProfileAdminForm(Form):
     submit = SubmitField('Submit')
 
     def __init__(self, user, *args, **kwargs):
-        super(EdiProfileAdminForm, self).__init__(*args, **kwargs)
+        super(ProfileAdminForm, self).__init__(*args, **kwargs)
         self.main_language.choices = [
             (language.id, language.name) for language in
             Language.query.order_by(Language.id).all()]
@@ -54,5 +55,25 @@ class EdiProfileAdminForm(Form):
         if field.data != self.user.email \
                 and User.query.filter_by(email=field.email).first():
             raise ValidationError('Email already registered')
+
+
+class PostForm(Form):
+    title = StringField('Title', validators=[
+        Length(0, 128), DataRequired('Your article must have a title')])
+    body = PageDownField('Body', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class PostAdminForm(Form):
+    title = StringField('Title', validators=[
+        Length(0, 128), DataRequired('Your article must have a title')])
+    author = SelectField('author', coerce=int)
+    body = PageDownField('Body', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+    def __init__(self, *args, **kwargs):
+        super(PostAdminForm, self).__init__(*args, **kwargs)
+        self.author.choices = [(author.id, author.username) for author in
+                               User.query.order_by(User.username.asc()).all()]
 
 

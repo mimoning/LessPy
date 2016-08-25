@@ -94,14 +94,12 @@ def resend_confirmation():
     return redirect(url_for('main.index'))
 
 
-#TODO password change
+# TODO password change
 
 
-
-#TODO forget password
-
+# TODO forget password
 
 
-#TODO email change
+# TODO email change
 
 
